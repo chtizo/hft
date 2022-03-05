@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HFT - Summarize and Q & A</title>
+    <style>
+        @import url("https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap");
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto Mono';
+        }
+
+        html, body {
+            position: relative;
+            min-height: 100vh;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #loading {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: whitesmoke;
+            font-size: 45px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: slateblue;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.5s ease;
+            white-space: pre;
+        }
+
+        .lcont {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #loading-progress {
+            font-size: 30px;
+        }
+
+        textarea {
+            font-size: 18px;
+            padding: 5px;
+            resize: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="loading">
+        <div class="lcont"><i class="fas fa-spinner fa-pulse"></i><span> </span><span id="loading-progress"></span></div>
+    </div>
+
+    <form id="main_form" enctype="multipart/form-data">  
+        {% csrf_token %}  
+        {{ m_form.as_p }}  
+    </form>
+
+    <form id="question_form" enctype="multipart/form-data">  
+        {% csrf_token %}  
+        {{ q_form.as_p }}  
+    </form>
+
+    <form id="init_form" enctype="multipart/form-data">  
+        {% csrf_token %}  
+        {{ i_form.as_p }}  
+    </form>
+
+    <script>
+        document.querySelectorAll('label').forEach(label => {
+            label.remove();
+        })
+
+        async function inititiate() {
+            console.log('Initializing...');
+            document.getElementById('loading-progress').innerText = 'Initializing...';
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/');
+            xhr.onreadystatechange = e => {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    console.log(xhr.responseText);
+                    document.getElementById('loading').style.opacity = 0;
+                    document.getElementById('loading-progress').innerText = xhr.responseText;
+                }
+            }
+            var init = new FormData(document.getElementById('init_form'));
+            xhr.send(init);
+        }
+
+        // inititiate();
+    </script>
+</body>
+</html>
