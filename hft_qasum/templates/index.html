@@ -9,6 +9,10 @@
     <style>
         @import url("https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap");
 
+        :root {
+            zoom: 100%;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -19,13 +23,15 @@
         html, body {
             position: relative;
             min-height: 100vh;
+            width: 100%;
         }
 
         body {
+            position: relative;
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
+            height: 100vh;
         }
 
         #loading {
@@ -57,9 +63,106 @@
         }
 
         textarea {
-            font-size: 18px;
+            font-size: 16px;
             padding: 5px;
+            padding: 10px;
             resize: none;
+        }
+
+        #left {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            height: 100%;
+            width: 50%;
+        }
+
+        #dis-cont {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 40%;
+            width: 100%;
+            white-space: pre-wrap;
+            overflow: hidden;
+        }
+
+        #dis {
+            width: 90%;
+            height: 80%;
+            text-align: justify;
+            padding: 0 10px;
+            overflow: auto;
+        }
+
+        #answer-cont {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100px;
+            width: 100%;
+            white-space: pre-wrap;
+            overflow: hidden;
+        }
+
+        #answer {
+            width: 90%;
+            height: 80%;
+            text-align: justify;
+            padding: 0 10px;
+            overflow: auto;
+        }
+
+        #right {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            padding-top: 2%;
+            align-items: center;
+            height: 100%;
+            width: 50%;
+        }
+
+        #summary-cont {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100px;
+            width: 100%;
+            white-space: pre-wrap;
+            overflow: hidden;
+        }
+
+        #summary {
+            width: 90%;
+            height: 80%;
+            text-align: justify;
+            padding: 0 10px;
+            overflow: auto;
+        }
+
+        button {
+            padding: 10px 15px;
+            margin: 20px;
+            outline: none;
+            border: none;
+            border-radius: 4px;
+            background-color: slateblue;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        button:hover {
+            /* transition: all 0s !important; */
+            background-color: rgb(122, 107, 221);
+        }
+
+        button:active {
+            transition: all 0s !important;
+            background-color: rgb(87, 71, 189);
         }
     </style>
 </head>
@@ -68,15 +171,24 @@
         <div class="lcont"><i class="fas fa-spinner fa-pulse"></i><span> </span><span id="loading-progress"></span></div>
     </div>
 
-    <form id="main_form" enctype="multipart/form-data">  
-        {% csrf_token %}  
-        {{ m_form.as_p }}  
-    </form>
+    <div id="right">
+        <form id="main_form" enctype="multipart/form-data">  
+            {% csrf_token %}  
+            {{ m_form.as_p }}  
+        </form>
+        <button type="button" id="submit">Submit Text / Article</button>
+        <div id="summary-cont"><div id="summary"></div></div>
+    </div>
 
-    <form id="question_form" enctype="multipart/form-data">  
-        {% csrf_token %}  
-        {{ q_form.as_p }}  
-    </form>
+    <div id="left">
+        <div id="dis-cont"><div id="dis"></div></div>
+        <form id="question_form" enctype="multipart/form-data">  
+            {% csrf_token %}  
+            {{ q_form.as_p }}  
+        </form>
+        <button type="button" id="ask">Ask Question</button>
+        <div id="answer-cont"><div id="answer"></div></div>
+    </div>
 
     <form id="init_form" enctype="multipart/form-data">  
         {% csrf_token %}  
@@ -87,6 +199,16 @@
         document.querySelectorAll('label').forEach(label => {
             label.remove();
         })
+
+        document.documentElement.style.setProperty('zoom', ((document.documentElement.clientWidth/1920)*100) + "%");
+
+        const submit = document.getElementById('submit');
+        const ask = document.getElementById('ask');
+        const display = document.getElementById('dis');
+        const article = document.getElementById('main_text');
+        const question = document.getElementById('ques');
+        const answer = document.getElementById('answer');
+        const summary = document.getElementById('summary');
 
         async function inititiate() {
             console.log('Initializing...');
@@ -105,6 +227,23 @@
         }
 
         // inititiate();
+
+        submit.addEventListener('click', (e) => {
+            if (article.value) {
+                display.innerHTML = article.value;
+                summary.innerHTML = "<b>Summary:</b> \n\n" + article.value;
+            }
+        })
+
+        ask.addEventListener('click', (e) => {
+            if (display.innerText && question.value) {
+                answer.innerHTML = '<b>Answer:</b> \n\nGot Answer';
+            } else if (display.innerHTML == "") {
+                window.alert('Please enter some article or text!');
+            } else {
+                window.alert('Please enter a question');
+            }
+        })
     </script>
 </body>
 </html>
