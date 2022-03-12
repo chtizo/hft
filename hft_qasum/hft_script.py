@@ -31,6 +31,8 @@ if __name__ == "__main__":
 
     pipes = init()
 
+    print('Initiated')
+
     summar = summ(pipes['summ'], main_text)
     answ = ques(pipes['qa'], main_text, "How does Spiderman feel?")
 

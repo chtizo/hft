@@ -50,6 +50,7 @@
             pointer-events: none;
             transition: all 0.5s ease;
             white-space: pre;
+            z-index: 99;
         }
 
         .lcont {
@@ -69,13 +70,15 @@
             resize: none;
         }
 
-        #left {
+        #right {
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
             align-items: center;
             height: 100%;
             width: 50%;
+            filter: saturate(0%);
+            pointer-events: none;
         }
 
         #dis-cont {
@@ -97,10 +100,11 @@
         }
 
         #answer-cont {
+            position: relative;
             display: flex;
             justify-content: center;
             align-items: flex-start;
-            min-height: 100px;
+            min-height: 25%;
             width: 100%;
             white-space: pre-wrap;
             overflow: hidden;
@@ -114,7 +118,7 @@
             overflow: auto;
         }
 
-        #right {
+        #left {
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
@@ -125,10 +129,11 @@
         }
 
         #summary-cont {
+            position: relative;
             display: flex;
             justify-content: center;
             align-items: flex-start;
-            min-height: 100px;
+            min-height: 25%;
             width: 100%;
             white-space: pre-wrap;
             overflow: hidden;
@@ -136,7 +141,6 @@
 
         #summary {
             width: 90%;
-            height: 80%;
             text-align: justify;
             padding: 0 10px;
             overflow: auto;
@@ -164,23 +168,184 @@
             transition: all 0s !important;
             background-color: rgb(87, 71, 189);
         }
+
+        #textorocr {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #ocr {
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.3);
+            z-index: 98;
+            pointer-events: none;
+            opacity: 0;
+        }
+
+        #upload {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 700px;
+            height: 550px;
+            border: 4px dashed slateblue;
+            border-radius: 4px;
+            overflow: hidden;
+            background-color: white;
+            opacity: 0.75;
+            color: slateblue;
+            font-size: 25px;
+            cursor: pointer;
+        }
+
+        #upload:hover {
+            opacity: 1 !important;
+        }
+
+        #upload.dragged {
+            opacity: 1 !important;
+        }
+
+        #upload.selected {
+            opacity: 1;
+        }
+
+        #upload.selected:hover {
+            opacity: 0.8 !important;
+        }
+
+        #upload.selected.dragged {
+            opacity: 0.8 !important;
+        }
+
+        #upload i {
+            font-size: 100px;
+        }
+
+        #upload * {
+            pointer-events: none;
+        }
+
+        #ocr-preview {
+            position: absolute;
+            opacity: 0;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 98;
+        }
+
+        #ocr-preview-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("src/transparent_grid.gif");
+            background-repeat: repeat;
+            opacity: 0;
+            z-index: 97;
+        }
+
+        #ocr-preview-bg-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: white;
+            opacity: 0;
+            z-index: 96;
+        }
+
+        #init-ocr {
+            display: none;
+        }
+
+        #ocr-close {
+            position: absolute;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            top: 50px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            transform: translate(-50%, -50%);
+            color: white;
+            cursor: pointer;
+            font-size: 50px;
+            z-index: 2;
+        }
+
+        #reset {
+            position: absolute;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            top: 20px;
+            left: 50%;
+            transform: translate(-50%, 0);
+            color: slateblue;
+            background-color: transparent;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            padding: 5px;
+            cursor: pointer;
+        }
+
+        #reset:hover {
+            border: 1px solid rgba(106, 90, 205, 0.2);
+            background-color: white;
+            filter: drop-shadow(4px 4px 5px rgba(0, 0, 0, 0.2));
+        }
+
+        #reset:active {
+            border: 1px solid rgba(106, 90, 205, 0.2);
+            background-color: white;
+            filter: drop-shadow(2px 2px 5px rgba(0, 0, 0, 0.2));
+        }
+
+        #reset i {
+            font-size: 30px;
+        }
     </style>
 </head>
 <body>
+    <div id="reset">
+        <i class="fas fa-rotate-right"></i>
+    </div>
+
     <div id="loading">
         <div class="lcont"><i class="fas fa-spinner fa-pulse"></i><span> </span><span id="loading-progress"></span></div>
     </div>
 
-    <div id="right">
+    <div id="left">
         <form id="main_form" enctype="multipart/form-data">  
             {% csrf_token %}  
             {{ m_form.as_p }}  
         </form>
-        <button type="button" id="submit">Submit Text / Article</button>
+        <div id="textorocr">
+            <button type="button" id="submit">Submit Text / Article</button>
+            <span style="white-space: pre;"> ( or ) </span>
+            <button type="button" id="useocr">Use OCR</button>
+        </div>
         <div id="summary-cont"><div id="summary"></div></div>
     </div>
 
-    <div id="left">
+    <div id="right">
         <div id="dis-cont"><div id="dis"></div></div>
         <form id="question_form" enctype="multipart/form-data">  
             {% csrf_token %}  
@@ -188,6 +353,24 @@
         </form>
         <button type="button" id="ask">Ask Question</button>
         <div id="answer-cont"><div id="answer"></div></div>
+    </div>
+
+    <div id="ocr">
+        <div id="ocr-close"><i class="fas fa-xmark"></i></div>
+        <div id="upload">
+            <i class="fas fa-image"></i> <br>
+            <span>Drag & Drop</span>
+            <span>or</span>
+            <span>Click to Upload</span>
+            <img id="ocr-preview" src="" alt="ocr_preview">
+            <div id="ocr-preview-bg"></div>
+            <div id="ocr-preview-bg-bg"></div>
+        </div>
+        <button id="init-ocr">Scan for Text</button>
+        <form id="ocr_form" enctype="multipart/form-data">
+            {% csrf_token %}  
+            {{ o_form.as_p }}  
+        </form>
     </div>
 
     <form id="init_form" enctype="multipart/form-data">  
@@ -200,17 +383,55 @@
             label.remove();
         })
 
+        async function sleep(ms) {
+            return new Promise(r => setTimeout(() => r(), ms));
+        }
+
+        const width = window.screen.width;
+
         document.documentElement.style.setProperty('zoom', ((document.documentElement.clientWidth/1920)*100) + "%");
+
+        window.addEventListener('resize', (e) => {
+            // if (document.documentElement.clientWidth > (width * 0.75)) {
+            //     document.documentElement.style.setProperty('zoom', ((document.documentElement.clientWidth/1920)*100) + "%");
+            // }
+            document.documentElement.style.setProperty('zoom', ((document.documentElement.clientWidth/1920)*100) + "%");
+        })
+
+        const formats = ['jpeg', 'jpg', 'png', 'bmp', 'webp'];
 
         const submit = document.getElementById('submit');
         const ask = document.getElementById('ask');
         const display = document.getElementById('dis');
-        const article = document.getElementById('main_text');
+        const article = document.getElementById('article');
         const question = document.getElementById('ques');
         const answer = document.getElementById('answer');
         const summary = document.getElementById('summary');
+        const right = document.getElementById('right');
+        const left = document.getElementById('left');
+        const ocr = document.getElementById('ocr');
+        const ocr_close = document.getElementById('ocr-close');
+        const use_ocr = document.getElementById('useocr');
+        const ocr_image = document.getElementById('image');
+        const ocr_upload = document.getElementById('upload');
+        const ocr_dis_icon = ocr_upload.querySelector('i');
+        const ocr_dis_text = ocr_upload.querySelectorAll('span');
+        const ocr_preview = document.getElementById('ocr-preview');
+        const ocr_preview_bg = document.getElementById('ocr-preview-bg');
+        const ocr_preview_bg_bg = document.getElementById('ocr-preview-bg-bg');
+        const init_ocr = document.getElementById('init-ocr');
+        const reset = document.getElementById('reset');
+
+        var init = false;
+        var process = false;
+
+        reset.addEventListener('click', (e) => {
+            location.reload();
+        })
 
         async function inititiate() {
+            document.getElementById('loading').style.opacity = 1;
+            document.getElementById('loading').style.pointerEvents = 'all';
             console.log('Initializing...');
             document.getElementById('loading-progress').innerText = 'Initializing...';
             var xhr = new XMLHttpRequest();
@@ -218,30 +439,295 @@
             xhr.onreadystatechange = e => {
                 if (xhr.readyState == 4 && xhr.status == 200) {
                     console.log(xhr.responseText);
-                    document.getElementById('loading').style.opacity = 0;
                     document.getElementById('loading-progress').innerText = xhr.responseText;
+                    document.getElementById('loading').style.opacity = 0;
+                    document.getElementById('loading').style.pointerEvents = 'none';
+                    init = true;
+                    process = false;
                 }
             }
-            var init = new FormData(document.getElementById('init_form'));
-            xhr.send(init);
+            var initializer = new FormData(document.getElementById('init_form'));
+            xhr.send(initializer);
         }
 
-        // inititiate();
+        async function summarize() {
+            console.log('Summarizing...');
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/');
+            xhr.onreadystatechange = e => {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    console.log(xhr.responseText);
+                    summary.innerHTML = "<b>Summary:</b> \n\n" + xhr.responseText;
+                    submit.style.pointerEvents = 'all';
+                    submit.style.cursor = 'pointer';
+                    submit.style.filter = '';
+                    submit.innerHTML = 'Submit Text / Article';
+                    right.style.filter = 'saturate(100%)';
+                    right.style.pointerEvents = 'all';
+                    process = false;
+                }
+            }
+            var sum = new FormData(document.getElementById('main_form'));
+            xhr.send(sum);
+        }
 
-        submit.addEventListener('click', (e) => {
-            if (article.value) {
+        async function answer_it() {
+            console.log('Answering...');
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/');
+            xhr.onreadystatechange = e => {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    console.log(xhr.responseText);
+                    answer.innerHTML = '<b>Answer:</b> \n\n' + xhr.responseText;
+                    ask.style.pointerEvents = 'all';
+                    ask.style.cursor = 'pointer';
+                    ask.style.filter = 'saturate(100%)';
+                    ask.innerHTML = 'Ask Question';
+                    process = false;
+                }
+            }
+            var ques = new FormData(document.getElementById('question_form'));
+            xhr.send(ques);
+        }
+
+        async function read_ocr() {
+            console.log('Reading Image...');
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', '/');
+            xhr.onreadystatechange = e => {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    console.log(xhr.responseText);
+                    article.value = xhr.responseText;
+                    ocr.style.pointerEvents = 'all';
+                    init_ocr.style.cursor = 'pointer';
+                    init_ocr.style.filter = 'saturate(100%)';
+                    init_ocr.innerHTML = 'Scan for Text';
+                    ocr_close.click();
+                    process = false;
+                }
+            }
+            var ques = new FormData(document.getElementById('ocr_form'));
+            xhr.send(ques);
+        }
+
+        inititiate();
+
+        submit.addEventListener('click', async (e) => {
+            if (article.value && init) {
+                submit.style.pointerEvents = 'none';
+                submit.style.cursor = 'default';
+                submit.style.filter = 'saturate(0%)';
+                submit.innerHTML = '<i class="fas fa-spinner fa-pulse"></i>';
+                summary.innerHTML = 'Analyzing...';
                 display.innerHTML = article.value;
+                process = true;
+                summarize();
+            } else if (article.value) {
+                submit.style.pointerEvents = 'none';
+                submit.style.cursor = 'default';
+                submit.style.filter = 'saturate(0%)';
+                submit.innerHTML = '<i class="fas fa-spinner fa-pulse"></i>';
+                summary.innerHTML = 'Analyzing...';
+                display.innerHTML = article.value;
+                process = true;
+                await sleep(2000);
+                submit.style.pointerEvents = 'all';
+                submit.style.cursor = 'pointer';
+                submit.style.filter = '';
+                submit.innerHTML = 'Submit Text / Article';
                 summary.innerHTML = "<b>Summary:</b> \n\n" + article.value;
+                right.style.filter = 'saturate(100%)';
+                right.style.pointerEvents = 'all';
+                process = false;
             }
         })
 
-        ask.addEventListener('click', (e) => {
-            if (display.innerText && question.value) {
+        ask.addEventListener('click', async (e) => {
+            if (display.innerText && question.value && init) {
+                ask.style.pointerEvents = 'none';
+                ask.style.cursor = 'default';
+                ask.style.filter = 'saturate(0%)';
+                ask.innerHTML = '<i class="fas fa-spinner fa-pulse"></i>';
+                answer.innerHTML = 'Analyzing...';
+                process = true;
+                answer_it();
+            }
+            else if (display.innerText && question.value) {
+                ask.style.pointerEvents = 'none';
+                ask.style.cursor = 'default';
+                ask.style.filter = 'saturate(0%)';
+                ask.innerHTML = '<i class="fas fa-spinner fa-pulse"></i>';
+                answer.innerHTML = 'Analyzing...';
+                process = true;
+                await sleep(2000);
+                ask.pointerEvents = 'all';
+                ask.style.cursor = 'pointer';
+                ask.style.filter = 'saturate(100%)';
+                ask.innerHTML = 'Ask Question';
                 answer.innerHTML = '<b>Answer:</b> \n\nGot Answer';
+                process = false;
             } else if (display.innerHTML == "") {
                 window.alert('Please enter some article or text!');
             } else {
                 window.alert('Please enter a question');
+            }
+        })
+
+        init_ocr.addEventListener('click', async (e) => {
+            if (init) {
+                ocr.style.pointerEvents = 'none';
+                init_ocr.style.cursor = 'default';
+                init_ocr.style.filter = 'saturate(0%)';
+                init_ocr.innerHTML = '<i class="fas fa-spinner fa-pulse"></i>';
+                process = true;
+                read_ocr();
+            } else {
+                ocr.style.pointerEvents = 'none';
+                init_ocr.style.cursor = 'default';
+                init_ocr.style.filter = 'saturate(0%)';
+                init_ocr.innerHTML = '<i class="fas fa-spinner fa-pulse"></i>';
+                process = true;
+                await sleep(2000);
+                ocr.style.pointerEvents = 'all';
+                init_ocr.style.cursor = 'pointer';
+                init_ocr.style.filter = 'saturate(100%)';
+                init_ocr.innerHTML = 'Scan for Text';
+                ocr_close.click();
+                process = false;
+            }
+        })
+
+        use_ocr.addEventListener('click', (e) => {
+            ocr.style.pointerEvents = 'all';
+            ocr.style.opacity = 1;
+        })
+
+        ocr_close.addEventListener('click', (e) => {
+            ocr.style.pointerEvents = 'none';
+            ocr.style.opacity = 0;
+            if (ocr_upload.classList.contains('selected')) {
+                ocr_upload.classList.remove('selected');
+                ocr_upload.style.width = '700px';
+                ocr_upload.style.height = '550px';
+                ocr_preview.style.opacity = 0;
+                ocr_preview_bg.style.opacity = 0;
+                ocr_preview_bg_bg.style.opacity = 0;
+                ocr_preview.src = '';
+                ocr_image.value = '';
+            }
+        })
+
+        ocr_upload.addEventListener('dragover', (e) => {
+            e.preventDefault();
+        })
+
+        ocr_upload.addEventListener('dragenter', (e) => {
+            ocr_dis_text[0].innerHTML = 'Release to Upload';
+            ocr_dis_text[1].innerHTML = '';
+            ocr_dis_text[2].innerHTML = '';
+            if (!ocr_upload.classList.contains('dragged')) {
+                ocr_upload.classList.add('dragged');
+            }
+        })
+
+        ocr_upload.addEventListener('dragleave', (e) => {
+            ocr_dis_text[0].innerHTML = 'Drag & Drop';
+            ocr_dis_text[1].innerHTML = 'or';
+            ocr_dis_text[2].innerHTML = 'Click to Upload';
+            if (ocr_upload.classList.contains('dragged')) {
+                ocr_upload.classList.remove('dragged');
+            }
+        })
+
+        ocr_upload.addEventListener('drop', (e) => {
+            e.preventDefault();
+            if (formats.includes(e.dataTransfer.files[0].name.slice(-3).toLowerCase())) {
+                var url = URL.createObjectURL(e.dataTransfer.files[0]);
+                var temp_img = new Image();
+                temp_img.onload = () => {
+                    if ((temp_img.width * ocr_upload.clientHeight)/temp_img.height > ((1920 * 80)/100)) {
+                        ocr_upload.style.width = ((1920 * 80)/100) + 'px';
+                        ocr_upload.style.height = ((temp_img.height * ocr_upload.clientWidth)/temp_img.width) + 'px';
+                    } else {
+                        ocr_upload.style.width = ((temp_img.width * ocr_upload.clientHeight)/temp_img.height) + 'px';
+                    }
+                }
+                temp_img.src = url;
+                ocr_image.files = e.dataTransfer.files;
+                ocr_preview.src = url;
+                ocr_preview.style.opacity = 1;
+                ocr_preview_bg.style.opacity = 0.5;
+                ocr_preview_bg_bg.style.opacity = 1;
+                if (!ocr_upload.classList.contains('selected')) {
+                    ocr_upload.classList.add('selected');
+                    init_ocr.style.display = 'block';
+                }
+
+                if (ocr_upload.classList.contains('dragged')) {
+                    ocr_upload.classList.remove('dragged');
+                }
+            } else {
+                var list = '';
+                formats.forEach(ext => {
+                    if (formats.indexOf(ext) == 0) {
+                        list += ext.toUpperCase();
+                    } else {
+                        list += ', ' + ext.toUpperCase();
+                    }
+                })
+                window.alert('Only Images With These Extensions - ' + list);
+            }
+        })
+
+        ocr_upload.addEventListener('click', (e) => {
+            ocr_image.click();
+        })
+
+        ocr_image.addEventListener('change', (e) => {
+            if (ocr_image.files[0]) {
+                if (formats.includes(ocr_image.files[0].name.slice(-3).toLowerCase())) {
+                    var url = URL.createObjectURL(ocr_image.files[0]);
+                    var temp_img = new Image();
+                    temp_img.onload = () => {
+                        if ((temp_img.width * ocr_upload.clientHeight)/temp_img.height > ((1920 * 80)/100)) {
+                            ocr_upload.style.width = ((1920 * 80)/100) + 'px';
+                            ocr_upload.style.height = ((temp_img.height * ocr_upload.clientWidth)/temp_img.width) + 'px';
+                        } else {
+                            ocr_upload.style.width = ((temp_img.width * ocr_upload.clientHeight)/temp_img.height) + 'px';
+                        }
+                    }
+                    temp_img.src = url;
+                    ocr_preview.src = url;
+                    ocr_preview.style.opacity = 1;
+                    ocr_preview_bg.style.opacity = 0.5;
+                    ocr_preview_bg_bg.style.opacity = 1;
+                    if (!ocr_upload.classList.contains('selected')) {
+                        ocr_upload.classList.add('selected');
+                        init_ocr.style.display = 'block';
+                    }
+
+                    if (ocr_upload.classList.contains('dragged')) {
+                        ocr_upload.classList.remove('dragged');
+                    }
+                } else {
+                    var list = '';
+                    formats.forEach(ext => {
+                        if (formats.indexOf(ext) == 0) {
+                            list += ext.toUpperCase();
+                        } else {
+                            list += ', ' + ext.toUpperCase();
+                        }
+                    })
+                    window.alert('Only Images With These Extensions - ' + list);
+                }
+            }
+        })
+
+        document.addEventListener('keyup', (e) => {
+            if (e.keyCode == 27 && !process) {
+                if (ocr.style.opacity == 1) {
+                    ocr_close.click();
+                }
             }
         })
     </script>
