@@ -23,15 +23,42 @@
         html, body {
             position: relative;
             min-height: 100vh;
+            min-width: 1920px;
             width: 100%;
         }
 
         body {
             position: relative;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh;
+        }
+
+        #top {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 50px;
+            width: 100%;
+            background-color: slateblue;
+        }
+
+        #heading {
+            font-size: 22px;
+            padding: 5px 10px;
+            color: white;
+        }
+
+        #cont {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: calc(100% - 50px);
+            width: 100%;
         }
 
         #loading {
@@ -85,7 +112,8 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 40%;
+            min-height: 333px;
+            height: 333px;
             width: 100%;
             white-space: pre-wrap;
             overflow: hidden;
@@ -104,18 +132,17 @@
             display: flex;
             justify-content: center;
             align-items: flex-start;
-            min-height: 25%;
             width: 100%;
+            min-height: 200px;
             white-space: pre-wrap;
-            overflow: hidden;
+            overflow: auto;
         }
 
         #answer {
             width: 90%;
-            height: 80%;
+            min-height: 10px;
             text-align: justify;
             padding: 0 10px;
-            overflow: auto;
         }
 
         #left {
@@ -133,17 +160,17 @@
             display: flex;
             justify-content: center;
             align-items: flex-start;
-            min-height: 25%;
             width: 100%;
+            min-height: 200px;
             white-space: pre-wrap;
-            overflow: hidden;
+            overflow: auto;
         }
 
         #summary {
             width: 90%;
+            min-height: 10px;
             text-align: justify;
             padding: 0 10px;
-            overflow: auto;
         }
 
         button {
@@ -324,59 +351,64 @@
     </style>
 </head>
 <body>
-    <div id="reset">
-        <i class="fas fa-rotate-right"></i>
+    <div id="top">
+        <span id="heading">Auto Summary and Q&A with Hugging Face Transform (With OCR Text Scanning)</span>
     </div>
-
-    <div id="loading">
-        <div class="lcont"><i class="fas fa-spinner fa-pulse"></i><span> </span><span id="loading-progress"></span></div>
-    </div>
-
-    <div id="left">
-        <form id="main_form" enctype="multipart/form-data">  
-            {% csrf_token %}  
-            {{ m_form.as_p }}  
-        </form>
-        <div id="textorocr">
-            <button type="button" id="submit">Submit Text / Article</button>
-            <span style="white-space: pre;"> ( or ) </span>
-            <button type="button" id="useocr">Use OCR</button>
+    <div id="cont">
+        <div id="reset">
+            <i class="fas fa-rotate-right"></i>
         </div>
-        <div id="summary-cont"><div id="summary"></div></div>
-    </div>
-
-    <div id="right">
-        <div id="dis-cont"><div id="dis"></div></div>
-        <form id="question_form" enctype="multipart/form-data">  
-            {% csrf_token %}  
-            {{ q_form.as_p }}  
-        </form>
-        <button type="button" id="ask">Ask Question</button>
-        <div id="answer-cont"><div id="answer"></div></div>
-    </div>
-
-    <div id="ocr">
-        <div id="ocr-close"><i class="fas fa-xmark"></i></div>
-        <div id="upload">
-            <i class="fas fa-image"></i> <br>
-            <span>Drag & Drop</span>
-            <span>or</span>
-            <span>Click to Upload</span>
-            <img id="ocr-preview" src="" alt="ocr_preview">
-            <div id="ocr-preview-bg"></div>
-            <div id="ocr-preview-bg-bg"></div>
+    
+        <div id="loading">
+            <div class="lcont"><i class="fas fa-spinner fa-pulse"></i><span> </span><span id="loading-progress"></span></div>
         </div>
-        <button id="init-ocr">Scan for Text</button>
-        <form id="ocr_form" enctype="multipart/form-data">
+    
+        <div id="left">
+            <form id="main_form" enctype="multipart/form-data">  
+                {% csrf_token %}  
+                {{ m_form.as_p }}  
+            </form>
+            <div id="textorocr">
+                <button type="button" id="submit">Submit Text / Article</button>
+                <span style="white-space: pre;"> ( or ) </span>
+                <button type="button" id="useocr">Use OCR</button>
+            </div>
+            <div id="summary-cont"><div id="summary"></div></div>
+        </div>
+    
+        <div id="right">
+            <div id="dis-cont"><div id="dis"></div></div>
+            <form id="question_form" enctype="multipart/form-data">  
+                {% csrf_token %}  
+                {{ q_form.as_p }}  
+            </form>
+            <button type="button" id="ask">Ask Question</button>
+            <div id="answer-cont"><div id="answer"></div></div>
+        </div>
+    
+        <div id="ocr">
+            <div id="ocr-close"><i class="fas fa-xmark"></i></div>
+            <div id="upload">
+                <i class="fas fa-image"></i> <br>
+                <span>Drag & Drop</span>
+                <span>or</span>
+                <span>Click to Upload</span>
+                <img id="ocr-preview" src="" alt="ocr_preview">
+                <div id="ocr-preview-bg"></div>
+                <div id="ocr-preview-bg-bg"></div>
+            </div>
+            <button id="init-ocr">Scan for Text</button>
+            <form id="ocr_form" enctype="multipart/form-data">
+                {% csrf_token %}  
+                {{ o_form.as_p }}  
+            </form>
+        </div>
+    
+        <form id="init_form" enctype="multipart/form-data">  
             {% csrf_token %}  
-            {{ o_form.as_p }}  
+            {{ i_form.as_p }}  
         </form>
     </div>
-
-    <form id="init_form" enctype="multipart/form-data">  
-        {% csrf_token %}  
-        {{ i_form.as_p }}  
-    </form>
 
     <script>
         document.querySelectorAll('label').forEach(label => {
@@ -388,14 +420,20 @@
         }
 
         const width = window.screen.width;
+        const clamp = 0.75;
 
-        document.documentElement.style.setProperty('zoom', ((document.documentElement.clientWidth/1920)*100) + "%");
+        if (document.documentElement.clientWidth > (width * clamp)) {
+            document.documentElement.style.setProperty('zoom', ((document.documentElement.clientWidth/1920)*100) + "%");
+        } else {
+            document.documentElement.style.setProperty('zoom', (clamp * 100) + "%");
+        }
 
         window.addEventListener('resize', (e) => {
-            // if (document.documentElement.clientWidth > (width * 0.75)) {
-            //     document.documentElement.style.setProperty('zoom', ((document.documentElement.clientWidth/1920)*100) + "%");
-            // }
-            document.documentElement.style.setProperty('zoom', ((document.documentElement.clientWidth/1920)*100) + "%");
+            if (document.documentElement.clientWidth > (width * clamp)) {
+                document.documentElement.style.setProperty('zoom', ((document.documentElement.clientWidth/1920)*100) + "%");
+            } else {
+                document.documentElement.style.setProperty('zoom', (clamp * 100) + "%");
+            }
         })
 
         const formats = ['jpeg', 'jpg', 'png', 'bmp', 'webp'];
